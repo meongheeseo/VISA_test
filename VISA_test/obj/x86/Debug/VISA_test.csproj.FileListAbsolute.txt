@@ -1,0 +1,11 @@
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\bin\Debug\VISA_test.exe
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\bin\Debug\VISA_test.pdb
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\MainWindow.baml
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\MainWindow.g.cs
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\App.g.cs
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test_MarkupCompile.cache
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test.g.resources
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test.Properties.Resources.resources
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test.csproj.GenerateResource.Cache
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test.exe
+C:\Users\john\Desktop\mhSeo\Projects\VISA_test\VISA_test\obj\x86\Debug\VISA_test.pdb
