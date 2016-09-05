@@ -81,10 +81,11 @@ namespace VISA_test
             thread.Abort();
             thread.Join();
 
-            adam4024.Write("#00C0-05.000\r\n");
+            wait(1.0);
+            adam4024.Write("#00C0-05.000\r");
 
             //            serialport.Close();
-            adam4024.Close();
+            //adam4024.Close();
             msgbox.AppendText("*****     Stop Data Read     *****\n");
         }
 
@@ -95,50 +96,54 @@ namespace VISA_test
         {
             msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), "*****     Start Data Read     *****\n");
 
-            int step = 100;
-            int i = 0;
-            int max = -1;
+            float step = 50.0F;
+            float i = 0.0F;
+            float max = -1.0F;
+            StringBuilder retMsg = new StringBuilder(500);
 
             while (start)
             {
-                int writeCount = 0;
-                String cmd = "FETCh?";
-                this.viStatus = VISA.viWrite(this.vi, cmd, cmd.Length, ref writeCount);
+                /*
+                                int writeCount = 0;
+                                String cmd = "FETCh?";
+                                this.viStatus = VISA.viWrite(this.vi, cmd, cmd.Length, ref writeCount);
 
-                if (this.viStatus < ViStatus.VI_SUCCESS)
+                                if (this.viStatus < ViStatus.VI_SUCCESS)
+                                {
+                                    MessageBox.Show(
+                                        "Error writing to the device!",
+                                        "R&S Korea Antenna Measure", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+
+                                int retCount = 0;
+                                StringBuilder retMsg = new StringBuilder(500);
+                                this.viStatus = VISA.viRead(this.vi, retMsg, 500, ref retCount);
+
+                                if (this.viStatus < ViStatus.VI_SUCCESS)
+                                {
+                                    MessageBox.Show(
+                                        "Error reading a response from the device!",
+                                        "R&S Korea Antenna Measure", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                                else
+                */
                 {
-                    MessageBox.Show(
-                        "Error writing to the device!",
-                        "R&S Korea Antenna Measure", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                    //msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), retMsg.ToString(0,13));
 
-                int retCount = 0;
-                StringBuilder retMsg = new StringBuilder(500);
-                this.viStatus = VISA.viRead(this.vi, retMsg, 500, ref retCount);
-
-                if (this.viStatus < ViStatus.VI_SUCCESS)
-                {
-                    MessageBox.Show(
-                        "Error reading a response from the device!",
-                        "R&S Korea Antenna Measure", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-                    msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), retMsg.ToString(0,13));
-                    double visa_data = Convert.ToDouble(retMsg.ToString(0, 13));
-                    double data = i * ((max + 5) / step) - 5;
-                    String msg = "#00C0" + formatNum(data) + "\r\n";
-
+                    //double visa_data = Convert.ToDouble(retMsg.ToString(0, 13));
+                    float data = i * ((max + 5.0F) / step) - 5.0F;
+                    String msg = "#00C0" + formatNum(data);
+                    msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), msg);
                     adam4024.Write(msg);
                     //serialport.Write(retMsg.ToString(0, 13) + "   ");
                 }
 
-                Thread.Sleep(1000);
-                i++;
+                Thread.Sleep(500);
+                i += 1.0F;
 
-                if (step == i)
+                if (i >= step)
                 {
-                    stopAll();
+                    adam4024.Write("#00C0-05.000\r");
                 }
             }
         }
@@ -163,21 +168,25 @@ namespace VISA_test
                 adam4024.Open();
                 adam4024.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
 
-                adam4024.Write("%0000000600\r\n");
-                msgbox.AppendText("%0000000600\r\n");
+                adam4024.Write("%0000000600\r");
+                msgbox.AppendText("%0000000600\r");
                 wait(0.5);
 
                 adam4024.Write("$007C0R32\r\n");
-                msgbox.AppendText("$007C0R32\r\n");
+                msgbox.AppendText("$007C0R32\r");
                 wait(0.5);
 
-                adam4024.Write("#00SC0-05.000\r\n");
-                msgbox.AppendText("#00SC0-05.000\r\n");
+                adam4024.Write("#00SC0-05.000\r");
+                msgbox.AppendText("#00SC0-05.000\r");
                 wait(0.5);
 
-                adam4024.Write("$004\r\n");
-                msgbox.AppendText("$004\r\n");
+                adam4024.Write("$004\r");
+                msgbox.AppendText("$004\r");
                 wait(0.5);
+
+                adam4024.Write("#00C0-05.000\r");
+                msgbox.AppendText("#00C0-05.000\r");
+
             }
             catch (Exception e)
             {
@@ -188,7 +197,7 @@ namespace VISA_test
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
-            msgbox.AppendText(sp.ReadExisting() + "\r\n");
+            msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), sp.ReadExisting());
         }
 
         public static void wait(double seconds)
@@ -208,11 +217,11 @@ namespace VISA_test
         {
             if (a >= 0)
             {
-                return (String.Format("{0, 0:+00.000}\r\n", a));
+                return (String.Format("{0, 0:+00.000}\r", a));
             }
             else
             {
-                return (String.Format("{0, 0:00.000}\r\n", a));
+                return (String.Format("{0, 0:00.000}\r", a));
             }
         }
 
