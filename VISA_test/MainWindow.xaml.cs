@@ -34,7 +34,8 @@ namespace VISA_test
         public MainWindow()
         {
             InitializeComponent();
-            readUSB();
+            //            readUSB();
+            connectSerial();
         }
 
         private void readUSB()
@@ -65,7 +66,6 @@ namespace VISA_test
         private void start_btn_Click(object sender, RoutedEventArgs e)
         {
             start = true;
-            connectSerial();
             thread = new Thread(readData);
             thread.Start();
         }
@@ -83,15 +83,17 @@ namespace VISA_test
 
             adam4024.Write("#00C0-05.000\r\n");
 
-            serialport.Close();
+            //            serialport.Close();
             adam4024.Close();
             msgbox.AppendText("*****     Stop Data Read     *****\n");
         }
 
+        public delegate void UpdateTextCallback(String msg);
+
         // Thread function that continuously reads in data values until stopped by the stop button.
         private void readData()
         {
-            msgbox.AppendText("*****     Start Data Read     *****\n");
+            msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), "*****     Start Data Read     *****\n");
 
             int step = 100;
             int i = 0;
@@ -122,7 +124,7 @@ namespace VISA_test
                 }
                 else
                 {
-                    msgbox.AppendText(retMsg.ToString(0, 13));
+                    msgbox.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), retMsg.ToString(0,13));
                     double visa_data = Convert.ToDouble(retMsg.ToString(0, 13));
                     double data = i * ((max + 5) / step) - 5;
                     String msg = "#00C0" + formatNum(data) + "\r\n";
@@ -146,14 +148,14 @@ namespace VISA_test
             try
             {
                 serialport = new SerialPort("COM35", 9600);
-                serialport.Open();
+                //                serialport.Open();
             }
             catch (Exception e)
             {
                 MessageBox.Show("Unable to conenct to serial port", "Warning", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            String adamSerialPort = "";
+            String adamSerialPort = "COM7";
             // ADAM 4024 Connection
             try
             {
@@ -164,15 +166,15 @@ namespace VISA_test
                 adam4024.Write("%0000000600\r\n");
                 msgbox.AppendText("%0000000600\r\n");
                 wait(0.5);
-                
+
                 adam4024.Write("$007C0R32\r\n");
                 msgbox.AppendText("$007C0R32\r\n");
                 wait(0.5);
-                
+
                 adam4024.Write("#00SC0-05.000\r\n");
                 msgbox.AppendText("#00SC0-05.000\r\n");
                 wait(0.5);
-                
+
                 adam4024.Write("$004\r\n");
                 msgbox.AppendText("$004\r\n");
                 wait(0.5);
@@ -182,7 +184,7 @@ namespace VISA_test
                 MessageBox.Show("Unable to connect to ADAM", "Warning", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-         
+
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
@@ -194,10 +196,10 @@ namespace VISA_test
             var frame = new DispatcherFrame();
 
             new Thread((ThreadStart)(() =>
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(seconds));
-                    frame.Continue = false;
-                })).Start();
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(seconds));
+                frame.Continue = false;
+            })).Start();
 
             Dispatcher.PushFrame(frame);
         }
@@ -212,6 +214,11 @@ namespace VISA_test
             {
                 return (String.Format("{0, 0:00.000}\r\n", a));
             }
+        }
+
+        private void UpdateText(String msg)
+        {
+            msgbox.AppendText(msg);
         }
     }
 }
